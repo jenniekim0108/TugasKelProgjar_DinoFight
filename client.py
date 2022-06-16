@@ -4,7 +4,7 @@ import pygame
 import pickle
 from bullet import Bullet
 
-SERVER = "172.27.80.1"
+SERVER = "192.168.43.208"  # Enter your server host
 PORT = 5555
 ADDRESS = (SERVER, PORT)
 
@@ -32,6 +32,8 @@ waiting_for_player = True
 font_of_start_game = pygame.font.SysFont("arial", 50, True)
 font_of_quit_game = pygame.font.SysFont("arial", 50, True)
 font_of_waiting_for_player = pygame.font.SysFont("arial", 100, True)
+font_health = pygame.font.SysFont("arial", 15, True)
+font_of_instruction = pygame.font.SysFont("arial", 15, True)
 
 
 def fade():
@@ -118,6 +120,14 @@ while menu:  # Main Menu
     quit_game = font_of_quit_game.render("QUIT", True, (255, 255, 255))
     Screen.fill((255, 255, 255))
 
+    # draw instructions play
+    text = font_of_instruction.render("How to play", 1, (0, 0, 0))
+    Screen.blit(text, (410, 430))
+    text = font_of_instruction.render("Move : WAD / Arrow Keys", 1, (0, 0, 0))
+    Screen.blit(text, (372, 450))
+    text = font_of_instruction.render("Attack : [Space]", 1, (0, 0, 0))
+    Screen.blit(text, (400, 470))
+
     # Start button
     pygame.draw.rect(Screen, (0, 0, 0), (40, 425, 175, 60))
     pygame.draw.rect(Screen, (255, 0, 0), (40, 425, 175, 60), 2)
@@ -182,6 +192,7 @@ while main:
     player1.score = 0
     font_of_player_name = pygame.font.SysFont("arial", 17, True, True)
     font_of_game_over = pygame.font.SysFont("arial", 100, True)
+    font_of_score = pygame.font.SysFont("arial", 50, True)
 
     # Game screen starts here
     while run:
@@ -193,6 +204,18 @@ while main:
         player2 = pickle.loads(client.recv(2048))
 
         Redraw_Screen()
+
+        # # draw instructions play
+        # text = font_of_instruction.render("Move : WASD / Arrow Keys", 1, (0, 0, 0))
+        # Screen.blit(text, (10, 10))
+        # text = font_of_instruction.render("Move : WASD / Arrow Keys", 1, (0, 0, 0))
+        # Screen.blit(text, (10, 10))
+
+        # draw health player
+        text = font_health.render(str(player1.name) + " health : " + str(player1.health), 1, (0, 0, 0))
+        Screen.blit(text, (770, 10))
+        text = font_health.render(str(player2.name) + " health : " + str(player2.health), 1, (0, 0, 0))
+        Screen.blit(text, (770, 30))
 
         if not player2.is_connected:
             fade()
@@ -241,14 +264,14 @@ while main:
                     p1_bullets.append(Bullet(player1.x - 10, player1.y + 10, facing, player1.id))
             bullet_count = 0.5
 
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             if player1.x <= 888 - player1.width + 5:
                 player1.x += player1.velocity
             player1.right = True
             player1.left = False
             player1.standing = False
 
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
             if player1.x >= 0 - 5:
                 player1.x -= player1.velocity
             player1.right = False
@@ -261,7 +284,7 @@ while main:
 
         # Should not go up or down while jumping...
         if not (player1.isjumping):
-            if keys[pygame.K_UP]:
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
                 player1.isjumping = True
                 # This if-else makes the jump facing left also & removes blinking while jump
                 if player1.right:
@@ -297,16 +320,20 @@ while main:
         if player1.health > (5 - player1.score) or not player2.is_connected:
             game_over = font_of_game_over.render("YOU WON", True, (255, 255, 255))
             Screen.blit(game_over, (200, 150))
+            score = font_of_score.render("Score : " + str(player1.score), True, (255, 255, 255))
+            Screen.blit(score, (330, 250))
         else:
             game_over = font_of_game_over.render("YOU LOSE", True, (255, 255, 255))
             Screen.blit(game_over, (200, 150))
+            score = font_of_score.render("Score : " + str(player1.score), True, (255, 255, 255))
+            Screen.blit(score, (330, 250))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run, main = False, False
 
         pygame.display.update()
-        time.sleep(2)
+        time.sleep(5)
         run, main = False, False
 
 pygame.quit()
