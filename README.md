@@ -13,7 +13,7 @@
 
 
 <h2>Requirements:</h2>
-`pip installk pygame` atau `pip install --user pygame 
+`pip installk pygame` atau `pip install --user pygame`
 
 <h2>Instruksi:</h2>
 <li>Jalankan server dengan ip address server</li>
